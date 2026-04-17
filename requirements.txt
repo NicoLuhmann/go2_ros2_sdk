@@ -4,10 +4,7 @@ paho-mqtt
 python-dotenv
 wasmtime
 open3d
-torch
-torchvision
 pycryptodome
 opencv-python
-pydub
 numpy==1.26.4
 

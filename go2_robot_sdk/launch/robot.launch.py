@@ -83,7 +83,7 @@ class Go2NodeFactory:
             DeclareLaunchArgument('rviz2', default_value='false', description='Launch RViz2'),
             DeclareLaunchArgument('nav2', default_value='true', description='Launch Nav2'),
             DeclareLaunchArgument('slam', default_value='true', description='Launch SLAM'),
-            DeclareLaunchArgument('foxglove', default_value='true', description='Launch Foxglove Bridge'),
+            DeclareLaunchArgument('foxglove', default_value='false', description='Launch Foxglove Bridge'),
             DeclareLaunchArgument('joystick', default_value='true', description='Launch joystick'),
             DeclareLaunchArgument('teleop', default_value='true', description='Launch teleoperation'),
         ]
@@ -273,7 +273,7 @@ class Go2NodeFactory:
     def create_include_launches(self) -> List[IncludeLaunchDescription]:
         """Create included launch descriptions"""
         use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-        with_foxglove = LaunchConfiguration('foxglove', default='true')
+        with_foxglove = LaunchConfiguration('foxglove', default='false')
         with_slam = LaunchConfiguration('slam', default='true')
         with_nav2 = LaunchConfiguration('nav2', default='true')
         

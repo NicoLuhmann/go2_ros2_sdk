@@ -45,7 +45,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     map_arg = LaunchConfiguration('map')
     with_rviz = LaunchConfiguration('rviz', default='false')
-    with_foxglove = LaunchConfiguration('foxglove', default='true')
+    with_foxglove = LaunchConfiguration('foxglove', default='false')
     with_joystick = LaunchConfiguration('joystick', default='true')
     
     launch_args = [
@@ -55,7 +55,7 @@ def generate_launch_description():
             description='Full path to map yaml file for navigation'
         ),
         DeclareLaunchArgument('rviz', default_value='false', description='Launch RViz2'),
-        DeclareLaunchArgument('foxglove', default_value='true', description='Launch Foxglove Bridge'),
+        DeclareLaunchArgument('foxglove', default_value='false', description='Launch Foxglove Bridge'),
         DeclareLaunchArgument('joystick', default_value='true', description='Launch joystick control'),
     ]
     

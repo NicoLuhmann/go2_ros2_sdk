@@ -85,7 +85,7 @@ class Go2NodeFactory:
             DeclareLaunchArgument('slam', default_value='true', description='Launch SLAM'),
             DeclareLaunchArgument('localization', default_value='false', description='Launch AMCL for localization (use with saved map)'),
             DeclareLaunchArgument('map', default_value=self.config.map_file, description='Full path to map yaml file for localization'),
-            DeclareLaunchArgument('foxglove', default_value='true', description='Launch Foxglove Bridge'),
+            DeclareLaunchArgument('foxglove', default_value='false', description='Launch Foxglove Bridge'),
             DeclareLaunchArgument('joystick', default_value='true', description='Launch joystick'),
             DeclareLaunchArgument('teleop', default_value='true', description='Launch teleoperation'),
         ]
@@ -295,7 +295,7 @@ class Go2NodeFactory:
         """Create included launch descriptions"""
         use_sim_time = LaunchConfiguration('use_sim_time', default='false')
         map_file = LaunchConfiguration('map')
-        with_foxglove = LaunchConfiguration('foxglove', default='true')
+        with_foxglove = LaunchConfiguration('foxglove', default='false')
         with_slam = LaunchConfiguration('slam', default='true')
         with_localization = LaunchConfiguration('localization', default='false')
         with_nav2 = LaunchConfiguration('nav2', default='true')

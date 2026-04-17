@@ -25,20 +25,21 @@ Customized fork of [abizovnuralem/go2_ros2_sdk](https://github.com/abizovnuralem
 
 ## Quick start
 
-Set environment variables (e.g. in `.env`):
+The launch files read `ROBOT_IP`, `CONN_TYPE`, and `ROBOT_TOKEN` from the container environment. When using the project's `docker-compose.yml`, these are populated from `.env` variables prefixed with `GO2_`:
 
 ```bash
-ROBOT_IP=192.168.123.x   # Go2 IP on the internal LAN
-ROBOT_TOKEN=             # Only needed for WebRTC — leave empty for CycloneDDS
-CONN_TYPE=cyclonedds     # See note below
+# In .env on the Jetson (see .env.example):
+GO2_IP=192.168.123.x      # Go2 IP on the internal LAN
+GO2_CONN_TYPE=cyclonedds  # see note below
+GO2_TOKEN=                # only needed for webrtc
 ```
 
 > **`CONN_TYPE` — robot connection, not ROS2 middleware.**
 > This controls how `go2_driver_node` connects *to the robot*, not how ROS2 nodes talk to each other.
-> The ROS2 middleware (also CycloneDDS) is configured automatically by the container via `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` and the mounted `cyclonedds.xml`.
+> The ROS2 middleware is also CycloneDDS, but it is configured automatically by the container via `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` and the mounted `cyclonedds.xml` — no action needed.
 >
-> - Use `cyclonedds` if the container is on the same LAN as the Go2 (e.g. Jetson Nano plugged into the robot network). The driver subscribes to the Go2's native DDS topics directly — lower latency, no extra connection setup, and consistent with how Foxglove bridge already discovers topics in this setup.
-> - Use `webrtc` only if connecting over WiFi to a different network or if the robot firmware requires it.
+> - Use `cyclonedds` if the Jetson is on the same LAN as the Go2. The driver subscribes to the Go2's native DDS topics directly — lower latency, no extra connection setup.
+> - Use `webrtc` only when connecting over WiFi from a different network or if the robot firmware requires it.
 
 **Mapping** — drive the robot around to build a 2D occupancy map:
 

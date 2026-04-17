@@ -80,7 +80,7 @@ class Go2NodeFactory:
     def create_launch_arguments(self) -> List[DeclareLaunchArgument]:
         """Create all launch arguments"""
         return [
-            DeclareLaunchArgument('rviz2', default_value='true', description='Launch RViz2'),
+            DeclareLaunchArgument('rviz2', default_value='false', description='Launch RViz2'),
             DeclareLaunchArgument('nav2', default_value='true', description='Launch Nav2'),
             DeclareLaunchArgument('slam', default_value='true', description='Launch SLAM'),
             DeclareLaunchArgument('localization', default_value='false', description='Launch AMCL for localization (use with saved map)'),
@@ -237,20 +237,6 @@ class Go2NodeFactory:
                     'publish_rate': 20.0
                 }],
             ),
-            # TTS Node (new separate package)
-            Node(
-                package='speech_processor',
-                executable='tts_node',
-                name='tts_node',
-                parameters=[{
-                    'api_key': os.getenv('ELEVENLABS_API_KEY', ''),
-                    'provider': 'elevenlabs',
-                    'voice_name': 'XrExE9yKIg1WjnnlVkGX',
-                    'local_playback': False,
-                    'use_cache': True,
-                    'audio_quality': 'standard'
-                }],
-            ),
         ]
     
     def create_teleop_nodes(self) -> List[Node]:
@@ -290,7 +276,7 @@ class Go2NodeFactory:
     
     def create_visualization_nodes(self) -> List[Node]:
         """Create visualization nodes (RViz, Foxglove)"""
-        with_rviz2 = LaunchConfiguration('rviz2', default='true')
+        with_rviz2 = LaunchConfiguration('rviz2', default='false')
         
         return [
             # RViz2

@@ -35,7 +35,6 @@ def generate_launch_description():
         'joystick': os.path.join(package_dir, 'config', 'joystick.yaml'),
         'twist_mux': os.path.join(package_dir, 'config', 'twist_mux.yaml'),
         'slam': os.path.join(package_dir, 'config', 'mapper_params_online_async.yaml'),
-        'rviz': os.path.join(package_dir, 'config', rviz_config),
         'urdf': os.path.join(package_dir, 'urdf', urdf_file),
     }
     
@@ -46,12 +45,12 @@ def generate_launch_description():
     
     # Launch arguments
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    with_rviz = LaunchConfiguration('rviz', default='true')
+    with_rviz = LaunchConfiguration('rviz', default='false')
     with_foxglove = LaunchConfiguration('foxglove', default='true')
     with_joystick = LaunchConfiguration('joystick', default='true')
     
     launch_args = [
-        DeclareLaunchArgument('rviz', default_value='true', description='Launch RViz2'),
+        DeclareLaunchArgument('rviz', default_value='false', description='Launch RViz2'),
         DeclareLaunchArgument('foxglove', default_value='true', description='Launch Foxglove Bridge'),
         DeclareLaunchArgument('joystick', default_value='true', description='Launch joystick control'),
     ]
@@ -136,20 +135,6 @@ def generate_launch_description():
                 'concurrency_level': 1,
             }],
             output='screen',
-        ),
-        # TTS Node
-        Node(
-            package='speech_processor',
-            executable='tts_node',
-            name='tts_node',
-            parameters=[{
-                'api_key': os.getenv('ELEVENLABS_API_KEY', ''),
-                'provider': 'elevenlabs',
-                'voice_name': 'XrExE9yKIg1WjnnlVkGX',
-                'local_playback': False,
-                'use_cache': True,
-                'audio_quality': 'standard'
-            }],
         ),
     ]
     

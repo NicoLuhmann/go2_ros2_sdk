@@ -80,7 +80,7 @@ class Go2NodeFactory:
     def create_launch_arguments(self) -> List[DeclareLaunchArgument]:
         """Create all launch arguments"""
         return [
-            DeclareLaunchArgument('rviz2', default_value='true', description='Launch RViz2'),
+            DeclareLaunchArgument('rviz2', default_value='false', description='Launch RViz2'),
             DeclareLaunchArgument('nav2', default_value='true', description='Launch Nav2'),
             DeclareLaunchArgument('slam', default_value='true', description='Launch SLAM'),
             DeclareLaunchArgument('foxglove', default_value='true', description='Launch Foxglove Bridge'),
@@ -191,10 +191,10 @@ class Go2NodeFactory:
                     'conn_type': self.config.conn_type
                 }],
             ),
-            # LiDAR processing node (new separate package)
+            # LiDAR processing node (C++ implementation)
             Node(
-                package='lidar_processor',
-                executable='lidar_to_pointcloud',
+                package='lidar_processor_cpp',
+                executable='lidar_to_pointcloud_node',
                 name='lidar_to_pointcloud',
                 parameters=[{
                     'robot_ip_lst': self.config.robot_ip_list,
@@ -202,10 +202,10 @@ class Go2NodeFactory:
                     'map_save': self.config.save_map
                 }],
             ),
-            # Advanced point cloud aggregator
+            # Advanced point cloud aggregator (C++ implementation)
             Node(
-                package='lidar_processor',
-                executable='pointcloud_aggregator',
+                package='lidar_processor_cpp',
+                executable='pointcloud_aggregator_node',
                 name='pointcloud_aggregator',
                 parameters=[{
                     'max_range': 20.0,
@@ -214,20 +214,6 @@ class Go2NodeFactory:
                     'height_filter_max': 3.0,
                     'downsample_rate': 5,
                     'publish_rate': 10.0
-                }],
-            ),
-            # TTS Node (new separate package)
-            Node(
-                package='speech_processor',
-                executable='tts_node',
-                name='tts_node',
-                parameters=[{
-                    'api_key': os.getenv('ELEVENLABS_API_KEY', ''),
-                    'provider': 'elevenlabs',
-                    'voice_name': 'XrExE9yKIg1WjnnlVkGX',
-                    'local_playback': False,
-                    'use_cache': True,
-                    'audio_quality': 'standard'
                 }],
             ),
         ]
@@ -269,8 +255,8 @@ class Go2NodeFactory:
     
     def create_visualization_nodes(self) -> List[Node]:
         """Create visualization nodes (RViz, Foxglove)"""
-        with_rviz2 = LaunchConfiguration('rviz2', default='true')
-        
+        with_rviz2 = LaunchConfiguration('rviz2', default='false')
+
         return [
             # RViz2
             Node(

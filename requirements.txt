@@ -3,8 +3,6 @@ aiohttp
 paho-mqtt
 python-dotenv
 wasmtime
-open3d
 pycryptodome
 opencv-python
 numpy==1.26.4
-

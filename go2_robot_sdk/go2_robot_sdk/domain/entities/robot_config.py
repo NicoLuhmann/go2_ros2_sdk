@@ -23,8 +23,7 @@ class RobotConfig:
                    publish_raw_voxel: bool, obstacle_avoidance: bool):
         """Создание конфигурации из параметров"""
         robot_ip_list = robot_ip.replace(" ", "").split(",")
-        conn_mode = "single" if (
-            len(robot_ip_list) == 1 and conn_type != "cyclonedds") else "multi"
+        conn_mode = "single" if len(robot_ip_list) == 1 else "multi"
         
         return cls(
             robot_ip_list=robot_ip_list,

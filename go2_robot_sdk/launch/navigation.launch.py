@@ -23,7 +23,7 @@ def generate_launch_description():
     conn_type = os.getenv('CONN_TYPE', 'webrtc')
     
     # Determine connection mode
-    conn_mode = "single" if len(robot_ip_list) == 1 and conn_type != "cyclonedds" else "multi"
+    conn_mode = "single" if len(robot_ip_list) == 1 else "multi"
     
     # Package paths
     package_dir = get_package_share_directory('go2_robot_sdk')
@@ -35,6 +35,7 @@ def generate_launch_description():
         'twist_mux': os.path.join(package_dir, 'config', 'twist_mux.yaml'),
         'nav2': os.path.join(package_dir, 'config', 'nav2_params.yaml'),
         'urdf': os.path.join(package_dir, 'urdf', urdf_file),
+        'rviz': os.path.join(package_dir, 'rviz', rviz_config),
     }
     
     print(f"🧭 Go2 Navigation Mode:")

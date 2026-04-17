@@ -6,3 +6,4 @@ wasmtime
 pycryptodome
 opencv-python
 numpy==1.26.4
+requests

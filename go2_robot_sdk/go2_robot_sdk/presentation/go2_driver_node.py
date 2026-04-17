@@ -15,9 +15,10 @@ from rclpy.qos_overriding_options import QoSOverridingOptions
 from rcl_interfaces.msg import SetParametersResult
 from tf2_ros import TransformBroadcaster
 
-from geometry_msgs.msg import Twist, PoseStamped
+from geometry_msgs.msg import Twist, TransformStamped
 from go2_interfaces.msg import Go2State, IMU
-from go2_interfaces.msg import LowState, VoxelMapCompressed, WebRtcReq
+from go2_interfaces.msg import VoxelMapCompressed, WebRtcReq
+from unitree_go.msg import LowState
 from sensor_msgs.msg import PointCloud2, JointState, Joy, Image, CameraInfo
 from nav_msgs.msg import Odometry
 
@@ -220,15 +221,20 @@ class Go2DriverNode(Node):
 
         # CycloneDDS support
         if self.config.conn_type == 'cyclonedds':
+            best_effort_qos = QoSProfile(
+                reliability=QoSReliabilityPolicy.BEST_EFFORT,
+                history=QoSHistoryPolicy.KEEP_LAST,
+                depth=1
+            )
+            self.create_subscription(
+                Odometry, '/utlidar/robot_odom',
+                self._on_cyclonedds_odom, best_effort_qos)
+            self.create_subscription(
+                PointCloud2, '/utlidar/cloud',
+                self._on_cyclonedds_lidar, best_effort_qos)
             self.create_subscription(
                 LowState, 'lowstate',
                 self._on_cyclonedds_low_state, qos_profile)
-            self.create_subscription(
-                PoseStamped, '/utlidar/robot_pose',
-                self._on_cyclonedds_pose, qos_profile)
-            self.create_subscription(
-                PointCloud2, '/utlidar/cloud',
-                self._on_cyclonedds_lidar, qos_profile)
 
     def _on_set_parameters(self, params) -> SetParametersResult:
         """Callback for parameter changes"""
@@ -316,19 +322,39 @@ class Go2DriverNode(Node):
 
     # CycloneDDS callbacks
     def _on_cyclonedds_low_state(self, msg: LowState) -> None:
-        """Processing LowState for CycloneDDS"""
-        # You can add processing for CycloneDDS here if needed
-        pass
+        """Publish joint states from LowState"""
+        joint_state = JointState()
+        joint_state.header.stamp = self.get_clock().now().to_msg()
+        joint_state.name = [
+            'FL_hip_joint', 'FL_thigh_joint', 'FL_calf_joint',
+            'FR_hip_joint', 'FR_thigh_joint', 'FR_calf_joint',
+            'RL_hip_joint', 'RL_thigh_joint', 'RL_calf_joint',
+            'RR_hip_joint', 'RR_thigh_joint', 'RR_calf_joint',
+        ]
+        joint_state.position = [
+            msg.motor_state[3].q, msg.motor_state[4].q, msg.motor_state[5].q,
+            msg.motor_state[0].q, msg.motor_state[1].q, msg.motor_state[2].q,
+            msg.motor_state[9].q, msg.motor_state[10].q, msg.motor_state[11].q,
+            msg.motor_state[6].q, msg.motor_state[7].q, msg.motor_state[8].q,
+        ]
+        self.ros2_publisher.publishers['joint_state'][0].publish(joint_state)
 
-    def _on_cyclonedds_pose(self, msg: PoseStamped) -> None:
-        """Processing pose for CycloneDDS"""
-        # You can add processing for CycloneDDS here if needed
-        pass
+    def _on_cyclonedds_odom(self, msg: Odometry) -> None:
+        """Forward /utlidar/robot_odom to /odom and broadcast odom -> base_link TF"""
+        self.ros2_publisher.publishers['odometry'][0].publish(msg)
+
+        tf = TransformStamped()
+        tf.header = msg.header
+        tf.child_frame_id = 'base_link'
+        tf.transform.translation.x = msg.pose.pose.position.x
+        tf.transform.translation.y = msg.pose.pose.position.y
+        tf.transform.translation.z = msg.pose.pose.position.z
+        tf.transform.rotation = msg.pose.pose.orientation
+        self.broadcaster.sendTransform(tf)
 
     def _on_cyclonedds_lidar(self, msg: PointCloud2) -> None:
-        """Processing lidar for CycloneDDS"""
-        # You can add processing for CycloneDDS here if needed
-        pass
+        """Forward /utlidar/cloud to /point_cloud2"""
+        self.ros2_publisher.publishers['lidar'][0].publish(msg)
 
     async def connect_robots(self) -> None:
         """Connect to robots"""

@@ -24,7 +24,7 @@ def generate_launch_description():
     conn_type = os.getenv('CONN_TYPE', 'webrtc')
     
     # Determine connection mode
-    conn_mode = "single" if len(robot_ip_list) == 1 and conn_type != "cyclonedds" else "multi"
+    conn_mode = "single" if len(robot_ip_list) == 1 else "multi"
     
     # Package paths
     package_dir = get_package_share_directory('go2_robot_sdk')
@@ -36,6 +36,7 @@ def generate_launch_description():
         'twist_mux': os.path.join(package_dir, 'config', 'twist_mux.yaml'),
         'slam': os.path.join(package_dir, 'config', 'mapper_params_online_async.yaml'),
         'urdf': os.path.join(package_dir, 'urdf', urdf_file),
+        'rviz': os.path.join(package_dir, 'rviz', rviz_config),
     }
     
     print(f"🗺️  Go2 Mapping Mode:")
@@ -118,19 +119,19 @@ def generate_launch_description():
             executable='pointcloud_to_laserscan_node',
             name='go2_pointcloud_to_laserscan',
             remappings=[
-                ('cloud_in', '/pointcloud/filtered'),
+                ('cloud_in', '/utlidar/cloud_base'),
                 ('scan', '/scan'),
             ],
             parameters=[{
-                'target_frame': 'base_link',
-                'max_height': 3.0,
-                'min_height': -1.0,
+                'target_frame': '',
+                'max_height': 0.5,
+                'min_height': -0.05,
                 'angle_min': -3.14159,
                 'angle_max': 3.14159,
-                'angle_increment': 0.00872665,
+                'angle_increment': 0.00436332,
                 'scan_time': 0.1,
                 'range_min': 0.3,
-                'range_max': 20.0,
+                'range_max': 6.0,
                 'use_inf': True,
                 'concurrency_level': 1,
             }],
